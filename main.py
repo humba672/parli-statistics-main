@@ -122,15 +122,18 @@ def doThings():
                     final.append(temp)
 
         # name, score, placement, diff from min, z-score
-        # agg z-score, agg placement, agg diff from min, mean(self) - mean(judges) 
-
+        # agg z-score, avg placement, avg diff from min, mean(self) - mean(judges) 
 
         for p in final:
             if not p[0] in final_data:
-                final_data[p[0]] = [0, 0, 0, [0,0]]
+                final_data[p[0]] = [0, [0,0], [0,0], [0,0]]
             final_data[p[0]][0] += p[4]
-            final_data[p[0]][1] += p[2]
-            final_data[p[0]][2] += p[3]
+            # final_data[p[0]][1] += p[2]
+            # final_data[p[0]][2] += p[3]
+            final_data[p[0]][1][0] += p[2]
+            final_data[p[0]][1][1] += 1
+            final_data[p[0]][2][0] += p[3]
+            final_data[p[0]][2][1] += 1
             final_data[p[0]][3][0] += p[1]
             final_data[p[0]][3][1] += 1
 
@@ -145,11 +148,15 @@ def doThings():
             pmean = final_data[p][3][0]/final_data[p][3][1]
             final_data[p][3] = round(pmean - judge_mean,2)
             final_data[p][0] = round(final_data[p][0],2)
+            tmean = final_data[p][1][0]/final_data[p][1][1]
+            final_data[p][1] = round(tmean, 2)
+            tmean = final_data[p][2][0]/final_data[p][2][1]
+            final_data[p][2] = round(tmean,2)
 
         # agg z-score, agg placement, agg diff from min, mean(self) - mean(judges) 
 
         with open(os.path.join(path, x_entry.text()), 'w') as f:
-            f.write('Name, Aggregate Z-Score, Aggregate Placement, Aggregate Points Above Minimum, Mean Score - Judge Mean\n')
+            f.write('Name, Aggregate Z-Score, Average Placement, Average Points Above Minimum, Mean Score - Judge Mean\n')
             for person in final_data:
                 p = final_data[person]
                 f.write(f'{person}, {p[0]}, {p[1]}, {p[2]}, {p[3]}\n')
