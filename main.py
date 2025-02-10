@@ -8,6 +8,9 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 path = ''
 
+def formatName(name):
+    return name[0].upper() + name[1].upper() + name[2:].lower()
+
 def getPath():
     global path
     path = str(QFileDialog.getExistingDirectory(window, "Select Directory to Write File to"))
@@ -19,6 +22,7 @@ def doThings():
     try:
         url = url_entry.text()
         num_rounds = int(r_entry.text())
+        speaks_url = speaks_entry.text()
 
         data_data = []
 
@@ -49,10 +53,10 @@ def doThings():
                 all_data.append({})
                 fails = 0
                 try:
-                    all_data[i][matches[4 + 6*i].div.span.span.nextSibling.strip()] = float(matches[4 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
-                    all_data[i][matches[4 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip()] = float(matches[4 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
-                    all_data[i][matches[5 + 6*i].div.span.span.nextSibling.strip()] = float(matches[5 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
-                    all_data[i][matches[5 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip()] = float(matches[5 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                    all_data[i][formatName(matches[4 + 6*i].div.span.span.nextSibling.strip())] = float(matches[4 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                    all_data[i][formatName(matches[4 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip())] = float(matches[4 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                    all_data[i][formatName(matches[5 + 6*i].div.span.span.nextSibling.strip())] = float(matches[5 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                    all_data[i][formatName(matches[5 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip())] = float(matches[5 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
 
                 except:
                     gov = False
@@ -71,15 +75,15 @@ def doThings():
                     if gov:
                         mav_name = matches[6*i]['title'].strip()
                         nm = mav_name.split(' ')[0][0].upper() + mav_name.split(' ')[1]
-                        all_data[i][nm] = float(matches[4+6*i].div.span.div.decode_contents().strip())
-                        all_data[i][matches[5 + 6*i].div.span.span.nextSibling.strip()] = float(matches[5 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
-                        all_data[i][matches[5 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip()] = float(matches[5 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                        all_data[i][formatName(nm)] = float(matches[4+6*i].div.span.div.decode_contents().strip())
+                        all_data[i][formatName(matches[5 + 6*i].div.span.span.nextSibling.strip())] = float(matches[5 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                        all_data[i][formatName(matches[5 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip())] = float(matches[5 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
                     else:
                         mav_name = matches[1+6*i]['title'].strip()
                         nm = mav_name.split(' ')[0][0].upper() + mav_name.split(' ')[1]
-                        all_data[i][nm] = float(matches[5+6*i].div.span.div.decode_contents().strip())
-                        all_data[i][matches[4 + 6*i].div.span.span.nextSibling.strip()] = float(matches[4 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
-                        all_data[i][matches[4 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip()] = float(matches[4 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                        all_data[i][formatName(nm)] = float(matches[5+6*i].div.span.div.decode_contents().strip())
+                        all_data[i][formatName(matches[4 + 6*i].div.span.span.nextSibling.strip())] = float(matches[4 + 6*i].div.span.nextSibling.nextSibling.span.div.decode_contents().strip())
+                        all_data[i][formatName(matches[4 + 6*i].div.nextSibling.nextSibling.span.span.nextSibling.strip())] = float(matches[4 + 6*i].div.nextSibling.nextSibling.span.nextSibling.nextSibling.span.div.decode_contents().strip())
 
                 judge_name = matches[2 + 6*i].div.span.nextSibling.strip()
 
@@ -107,6 +111,8 @@ def doThings():
         for judge in judge_data:
             judge_stdevs[judge] = statistics.stdev(judge_data[judge])
 
+        print(judge_data)
+
         for k in data_data:
             for match in k:
                 scores = sorted(list(match.values()))[::-1]
@@ -118,7 +124,10 @@ def doThings():
                     temp.append(score)
                     temp.append(scores.index(score))
                     temp.append(score-min(scores))
-                    temp.append((score-statistics.fmean(judge_data[judge_names[match['judge']-1000]]))/judge_stdevs[judge_names[match['judge']-1000]])
+                    if judge_stdevs[judge_names[match['judge']-1000]] != 0:
+                        temp.append((score-statistics.fmean(judge_data[judge_names[match['judge']-1000]]))/judge_stdevs[judge_names[match['judge']-1000]])
+                    else:
+                        temp.append(0)
                     final.append(temp)
 
         # name, score, placement, diff from min, z-score
@@ -136,6 +145,13 @@ def doThings():
             final_data[p[0]][2][1] += 1
             final_data[p[0]][3][0] += p[1]
             final_data[p[0]][3][1] += 1
+
+        if speaks_url != '':
+            r = requests.get(speaks_url)
+            soup = BeautifulSoup(r.content, 'html5lib')
+            tbody = soup.find('tbody')
+            for row in tbody.find_all('tr'):
+                final_data[formatName(row.td.nextSibling.nextSibling.decode_contents().strip()[0] + row.td.nextSibling.nextSibling.nextSibling.nextSibling.decode_contents().strip())].append(row.td.decode_contents().strip())
 
         judge_mean = 0
 
@@ -156,15 +172,16 @@ def doThings():
         # agg z-score, agg placement, agg diff from min, mean(self) - mean(judges) 
 
         with open(os.path.join(path, x_entry.text()), 'w') as f:
-            f.write('Name, Aggregate Z-Score, Average Placement, Average Points Above Minimum, Mean Score - Judge Mean\n')
+            f.write('Name, Aggregate Z-Score, Average Placement, Average Points Above Minimum, Mean Score - Judge Mean, Speaker Placement\n')
             for person in final_data:
                 p = final_data[person]
-                f.write(f'{person}, {p[0]}, {p[1]}, {p[2]}, {p[3]}\n')
+                f.write(f'{person}, {p[0]}, {p[1]}, {p[2]}, {p[3]}, {p[4] if len(p) >= 5 else 10**9}\n')
 
         success_indicator.setText('Success! Data written to ' + path + '/' + x_entry.text())
         success_indicator.adjustSize()
     except Exception as e:
         print(e)
+        print(person)
         success_indicator.setText("Error! Please send me the error in the command \nprompt (or read it yourself).")        
         success_indicator.adjustSize()
 
@@ -188,11 +205,14 @@ x_entry.move(10,210)
 select_file = QPushButton("Select folder to save file in", parent=window)
 select_file.move(150, 205)
 select_file.clicked.connect(getPath)
+speaks_label = QLabel("Enter Speaks URL (optional): ",parent=window).move(10,240)
+speaks_entry = QLineEdit(parent=window)
+speaks_entry.move(10,270)
 submit = QPushButton("Submit", parent=window)
 # 160
-submit.move(155, 250)
+submit.move(155, 300)
 submit.clicked.connect(doThings)
 success_indicator = QLabel(parent=window)
-success_indicator.move(10, 310)
+success_indicator.move(10, 330)
 window.show()
 sys.exit(app.exec())
